@@ -1,4 +1,4 @@
-##Log Establish VPN: 
+## Log Establish VPN: 
 Matched Jan 16 10:53:33 KAFKA10 ovpn-server[23219]:
 
 Jan 16 10:53:33 KAFKA10 ovpn-server[23219]: 172.31.81.66:53183 TLS: Initial packet from [AF_INET]172.31.81.66:53183, sid=eea2a213 f936b44a
