@@ -1,6 +1,5 @@
-﻿
-#Overview
-##1. Log
+# Overview
+## 1. Log
 
 Log  file: là một tệp tin được tạo ra bởi một máy chủ web hoặc máy chủ proxy chứa tất cả các thông tin về các hoạt động trên máy chủ đó, như thông tin người truy cập, thời gian khách hàng viếng thăm, ip,.. 
 
@@ -60,7 +59,7 @@ File log (ubuntu 14.04) lưu trong /var/log/
 
 * news: hệ thống tin tức, liên quan đến giao thức Network News Protocol (nntp)
 
-###Log hệ thống :
+### Log hệ thống :
 **Authorization Log**
 
 Authorization log lưu các thông tin về các hệ thống ủy quyền, các cơ chế ủy quyền các user, nhắc nhở về user password, ví dụ như hệ thống PAM (Pluggable Authentication Module), sudo command, các đăng nhập tới sshd. Các thông tin này được lưu lại trong /var/log/auth.log File log cung cấp các thông tin về đăng nhập user, việc sử dụng sudo command.
@@ -85,7 +84,7 @@ Hoặc tìm kiếm các dòng để cập đến Plug & Play systen, sử dụng
 
 Log hệ thống thông thường chứa các thông tin mặc định của hệ thống, thường được lưu trong /var/log/syslog hoặc /var/log/message.
 
-###Log rotation – xoay vòng file log
+### Log rotation – xoay vòng file log
 Thông thường khi nhìn vào thư mục /var/log sẽ thường có các file như syslog.1.gz, syslog.2.gz
 
 <img src="https://github.com/trangnth/Syslog/blob/master/img/var-log.png">
@@ -96,7 +95,7 @@ Mục đích của quá trình log rotation nhằm lưu trữ và nén ca
 
 Thông thường, quá trình rotation được được cấu hình trong file /etc/logrotate.conf. Các file cấu hình rotate riêng cho một số file log như: rsyslog,dpkg, apache, apt,.. sẽ được thêm vào trong /etc/logrotate.d/
 
-##2. Syslog
+## 2. Syslog
 Syslog là một giao thức client/server là giao thứ để chuyển log và thông điệp đến máy nhận log. Máy nhận log thường được gọi là syslogd, syslog daemon hoặc syslog server.
 
 Syslog có thể gửi qua ả UDP và TCP. Dữ liệu được gửi dưới dạng cleartext.
@@ -111,7 +110,7 @@ Một số khái niệm cơ bản:
 - Selector (bộ chọn): Một sự kết nối của một hoặc nhiều phương tiện và mức độ. Khi một sự kiện mới đến kết nối với một bộ chọn, một hành động được thực hiện.
 - Action (hành động): Điều gì xảy ra khi một thông tin mới đến kết nối với một bộ chọn. Các hành động có thể ghi thông tin tới file ghi log, phản xạ thông tin tới một bàn điều khiển hoặc thiết bị khác, ghi thông báo tới hệ thống ghi log của người sử dụng hoặc gửi thông báo cùng với máy chủ syslog khác.
 
-###Các hành động ghi log trong linux
+### Các hành động ghi log trong linux
 * Thông tin ghi log tới một file hoặc một thiết bị. Vd: `/var/log/lpr.log` hoặc `/dev/console`
 * Gửi một thông báo tới một người sử dụng. Bạn có thể xác định nhiều tên sử dụng bằng việc ngăn cách chúng bởi dấu phẩy ( ví dụ root, amrood)
 * Gửi một thông  báo tới tất cả người dùng. Trong trường hợp này, trường hành động bao gồm một dấu *
@@ -148,14 +147,14 @@ Hai cách ghi log cơ bản :
 - [program] ->syslog -> [log file]: 
 	Chương trình đẩy log thồng qua dịch vụ syslog hệ thống để phân loại và chỉ định hành động.
 
-###Định dạng chung của một gói tin syslog.
+### Định dạng chung của một gói tin syslog.
 Định dạng hoàn chỉnh của một thông báo syslog gồm 3 phần chính như sau
 
 <PRI> HEARDER MSG
 
 Độ dài của một thông báo không được vượt quá 1024 bytes
 
-####PRI
+#### PRI
 Phần này là một số 8 bit đặt trong ngoặc nhọn, 3 bit đầu thể hiện cho tính nghiêm trọng của thông báo, 5 bit còn lại đại diện cho cơ sở sinh ra thông báo.
 
 Giá trị Priority được tính như sau: Cơ sở sinh ra log x 8 + Mức độ nghiêm trọng. Ví dụ, thông báo từ kernel (Facility = 0) với mức độ nghiêm trọng (Severity =0) thì giá trị Priority = 0x8 +0 = 0. Trường hợp khác,với "local use 4" (Facility =20) mức độ nghiêm trọng (Severity =5) thì số Priority là 20 x 8 + 5 = 165.
@@ -174,14 +173,14 @@ Phần MSG chứa các thông tin về quá trình tạo ra thông điệ
 
 Tag field là tên chương trình tạo ra thông báo. Content field chứa các chi tiết của thông báo
 
-###Chi tiết file cấu hình của rsyslog
+### Chi tiết file cấu hình của rsyslog
 
 Trong UBUNTU file cấu hình là /etc/rsyslog.conf nhưng các rule được định nghĩa riêng trong /etc/rsyslog.d/50-defaul.conf . File rule này được khai báo include từ file cấu hình /etc/rsyslog.conf
 
-##3. rsyslog
+## 3. rsyslog
 Rsyslog - "The rocket-fast system for log processing" được bắt đầu phát triển từ năm 2004 bởi Rainer Gerhards rsyslog là một phần mềm mã nguồn mở sử dụng trên Linux dùng để chuyển tiếp các log message đến một địa chỉ trên mạng (log receiver, log server) Nó thực hiện giao thức syslog cơ bản, đặc biệt là sử dụng TCP cho việc truyền tải log từ client tới server. Hiện nay rsyslog là phần mềm được cài đặt sẵn trên hầu hết hệ thống Unix và các bản phân phối của Linux như : Fedora, openSUSE, Debian, Ubuntu, Red Hat Enterprise Linux, FreeBSD…
 
-##4. Sử dụng ELK để thu thập log
+## 4. Sử dụng ELK để thu thập log
 Dữ liệu gửi về cho Logstash; Logstash tiếp nhận và phân tích dữ liệu. Sau đó dữ liệu được gửi vào Elasticsearch; Elasticsearch nhận dữ liệu từ Logstash và lưu trữ, đánh chỉ mục; Kibana sử dụng các dữ liệu trong Elasticsearch để hiển thị và phân tích cú pháp tìm kiếm mà người dùng nhập vào để gửi cho Elasticsearch tìm kiếm.
 
 Logstash: Là một phần mềm mã nguồn mở dùng để thu thập log 
