@@ -1,20 +1,34 @@
 # Overview
-## 1. Log
+
+**MỤC LỤC**
+
+[1. Tổng quan về log](#mot)
+
+[2. Syslog](#hai)
+
+[3. Rsyslog](#ba)
+
+[4. Sử dụng ELK để thu thập log](#bon)
+
+[Tham khao](#thamkhao)
+
+
+<a name="mot"></a>
+## 1. Tổng quan về Log
 
 Log  file: là một tệp tin được tạo ra bởi một máy chủ web hoặc máy chủ proxy chứa tất cả các thông tin về các hoạt động trên máy chủ đó, như thông tin người truy cập, thời gian khách hàng viếng thăm, ip,.. 
 
 Các file log hệ thống lưu những thông tin hoạt đông của các function thiết yếu trong hệ thống. Ví dụ bao gồm cơ chế ủy quyền, các tiến trình hệ thống, các message hệ thống, syslog...
 
 Tác dụng của log:
-<ul>
-<li> Ghi lại liên tục các thông báo về hoạt động của cả hệ thống hoặc của các dịch vụ được triển khai trên hệ thống và file tương ứng. Log file thường là các file văn bản thông thường dưới dạng “clear text” tức là bạn có thể dễ dàng đọc vì thế có thể sử dụng các trình soạn thảo văn bản(vim, vi, nano,..) hoặc các trình xem văn bản thông thường( cat, tailf, head..) để đọc file log.</li>
-<li> Các file log cung cấp bất cứ thứ gì bạn cần biết, để giải quyết các rắc rối miễn là biết ứng dụng nào, tiến trình nào được ghi vào log nào cụ thể.</li>
-<li> Hậu hết các linux thì log được lưu tại **/var/log**.</li>
-</ul>
+* Ghi lại liên tục các thông báo về hoạt động của cả hệ thống hoặc của các dịch vụ được triển khai trên hệ thống và file tương ứng. Log file thường là các file văn bản thông thường dưới dạng “clear text” tức là bạn có thể dễ dàng đọc vì thế có thể sử dụng các trình soạn thảo văn bản(vim, vi, nano,..) hoặc các trình xem văn bản thông thường( cat, tailf, head..) để đọc file log.
+* Các file log cung cấp bất cứ thứ gì bạn cần biết, để giải quyết các rắc rối miễn là biết ứng dụng nào, tiến trình nào được ghi vào log nào cụ thể.
+* Hậu hết các linux thì log được lưu tại **/var/log**.
+
 
 File log (ubuntu 14.04) lưu trong /var/log/
 
-<img src="https://github.com/trangnth/Syslog/blob/master/img/var-log.png">
+<img src="img/var-log.png">
 
 * alternatives.log: thông tin update-alternatives đăng nhập vào file log này
 
@@ -87,7 +101,7 @@ Log hệ thống thông thường chứa các thông tin mặc định của h�
 ### Log rotation – xoay vòng file log
 Thông thường khi nhìn vào thư mục /var/log sẽ thường có các file như syslog.1.gz, syslog.2.gz
 
-<img src="https://github.com/trangnth/Syslog/blob/master/img/var-log.png">
+<img src="img/var-log.png">
 
 Đó là các rotated log file. Hệ thống sẽ tự động nén các file log cũ lại sau 1 time-frame được định sẵn, và bắt đầu một file log gốc mới.
 
@@ -95,6 +109,7 @@ Mục đích của quá trình log rotation nhằm lưu trữ và nén ca
 
 Thông thường, quá trình rotation được được cấu hình trong file /etc/logrotate.conf. Các file cấu hình rotate riêng cho một số file log như: rsyslog,dpkg, apache, apt,.. sẽ được thêm vào trong /etc/logrotate.d/
 
+<a name="hai"></a>
 ## 2. Syslog
 Syslog là một giao thức client/server là giao thứ để chuyển log và thông điệp đến máy nhận log. Máy nhận log thường được gọi là syslogd, syslog daemon hoặc syslog server.
 
@@ -105,20 +120,22 @@ Dùng cổng 514.
 *Các hành vi của syslogd được kiểm soát bởi file cấu hình /etc/syslog.conf*
 
 Một số khái niệm cơ bản:
+
 - Facility: giúp kiểm soát log đến dựa vào nguồn gốc được quy định như từ ứng dụng hay tiến trình nào. Syslog sử dụng facility để quy hoạch lại log như vậy có thể coi facility là đại diện cho đối tượng tạo ra thông báo (kernel, process, apps,..).
 - Priority (level): mức độ quan trọng của log message được chỉ định.
 - Selector (bộ chọn): Một sự kết nối của một hoặc nhiều phương tiện và mức độ. Khi một sự kiện mới đến kết nối với một bộ chọn, một hành động được thực hiện.
 - Action (hành động): Điều gì xảy ra khi một thông tin mới đến kết nối với một bộ chọn. Các hành động có thể ghi thông tin tới file ghi log, phản xạ thông tin tới một bàn điều khiển hoặc thiết bị khác, ghi thông báo tới hệ thống ghi log của người sử dụng hoặc gửi thông báo cùng với máy chủ syslog khác.
 
 ### Các hành động ghi log trong linux
+
 * Thông tin ghi log tới một file hoặc một thiết bị. Vd: `/var/log/lpr.log` hoặc `/dev/console`
 * Gửi một thông báo tới một người sử dụng. Bạn có thể xác định nhiều tên sử dụng bằng việc ngăn cách chúng bởi dấu phẩy ( ví dụ root, amrood)
 * Gửi một thông  báo tới tất cả người dùng. Trong trường hợp này, trường hành động bao gồm một dấu *
 * Gửi một thông báo thông qua pipe tới một chương trình. Trong trường hợp này, chương trình được xác định sau ký hiệu pipe ( | )
 * Gửi thông báo tới syslog trên một host khác. Trong trường hợp này, trường hành động bao gồm một tên host, được đặt trước bởi một dấu ký hiệu(vd: @tutorial.com)
 
-<img src="https://github.com/trangnth/Syslog/blob/master/img/nguon-sinh-log.png">
-<img src="https://github.com/trangnth/Syslog/blob/master/img/muc%20do%20canh%20bao.png">
+<img src="img/nguon-sinh-log.png">
+<img src="img/muc%20do%20canh%20bao.png">
 
 Ngoài ra còn một mức đặc biệt được gọi là none, mức này sẽ disable facility đi cùng. Level định nghĩa một số lượng các bản ghi chi tiết trong log file. Dấu sao [*] có thể sử dụng để miêu tả cho tất cả các facilities hoặc tất cả các levels.
 
@@ -154,32 +171,35 @@ Hai cách ghi log cơ bản :
 
 Độ dài của một thông báo không được vượt quá 1024 bytes
 
-#### PRI
-Phần này là một số 8 bit đặt trong ngoặc nhọn, 3 bit đầu thể hiện cho tính nghiêm trọng của thông báo, 5 bit còn lại đại diện cho cơ sở sinh ra thông báo.
+**PRI**
+* Phần này là một số 8 bit đặt trong ngoặc nhọn, 3 bit đầu thể hiện cho tính nghiêm trọng của thông báo, 5 bit còn lại đại diện cho cơ sở sinh ra thông báo.
 
-Giá trị Priority được tính như sau: Cơ sở sinh ra log x 8 + Mức độ nghiêm trọng. Ví dụ, thông báo từ kernel (Facility = 0) với mức độ nghiêm trọng (Severity =0) thì giá trị Priority = 0x8 +0 = 0. Trường hợp khác,với "local use 4" (Facility =20) mức độ nghiêm trọng (Severity =5) thì số Priority là 20 x 8 + 5 = 165.
+* Giá trị Priority được tính như sau: Cơ sở sinh ra log x 8 + Mức độ nghiêm trọng. Ví dụ, thông báo từ kernel (Facility = 0) với mức độ nghiêm trọng (Severity =0) thì giá trị Priority = 0x8 +0 = 0. Trường hợp khác,với "local use 4" (Facility =20) mức độ nghiêm trọng (Severity =5) thì số Priority là 20 x 8 + 5 = 165.
 
-Vậy biết một số Priority thì làm thế nào để biết nguồn sinh log và mức độ nghiêm trọng của nó. Ta xét 1 ví dụ sau:
+* Vậy biết một số Priority thì làm thế nào để biết nguồn sinh log và mức độ nghiêm trọng của nó. Ta xét 1 ví dụ sau:
 
-Priority = 191 Lấy 191:8 = 23.875 -> Facility = 23 ("local 7") -> Severity = 191 - (23 * 8 ) = 7 (debug)
+* Priority = 191 Lấy 191:8 = 23.875 -> Facility = 23 ("local 7") -> Severity = 191 - (23 * 8 ) = 7 (debug)
 
-#### HEADER
+**HEADER**
 Gồm các phần chính sau:
-+ time stamp: thời gian mà thông báo được tạo ra. Thời gian này được lấy từ thời gian hệ thống (Chú ý nếu như thời gian của server và client khác nhau thì thông báo ghi trên log được gửi lên server là thời gian của client)
-+ hostname hoặc ip
+* time stamp: thời gian mà thông báo được tạo ra. Thời gian này được lấy từ thời gian hệ thống (Chú ý nếu như thời gian của server và client khác nhau thì thông báo ghi trên log được gửi lên server là thời gian của client)
+* hostname hoặc ip
 
-#### MESSAGA 
-Phần MSG chứa các thông tin về quá trình tạo ra thông điệp đó. Gồm hai phần chính là: tag field và content field.
+**MESSAGE**
 
-Tag field là tên chương trình tạo ra thông báo. Content field chứa các chi tiết của thông báo
+* Phần MSG chứa các thông tin về quá trình tạo ra thông điệp đó. Gồm hai phần chính là: tag field và content field.
+
+* Tag field là tên chương trình tạo ra thông báo. Content field chứa các chi tiết của thông báo
 
 ### Chi tiết file cấu hình của rsyslog
 
 Trong UBUNTU file cấu hình là /etc/rsyslog.conf nhưng các rule được định nghĩa riêng trong /etc/rsyslog.d/50-defaul.conf . File rule này được khai báo include từ file cấu hình /etc/rsyslog.conf
 
+<a name="ba"></a>
 ## 3. rsyslog
 Rsyslog - "The rocket-fast system for log processing" được bắt đầu phát triển từ năm 2004 bởi Rainer Gerhards rsyslog là một phần mềm mã nguồn mở sử dụng trên Linux dùng để chuyển tiếp các log message đến một địa chỉ trên mạng (log receiver, log server) Nó thực hiện giao thức syslog cơ bản, đặc biệt là sử dụng TCP cho việc truyền tải log từ client tới server. Hiện nay rsyslog là phần mềm được cài đặt sẵn trên hầu hết hệ thống Unix và các bản phân phối của Linux như : Fedora, openSUSE, Debian, Ubuntu, Red Hat Enterprise Linux, FreeBSD…
 
+<a name="bon"></a>
 ## 4. Sử dụng ELK để thu thập log
 Dữ liệu gửi về cho Logstash; Logstash tiếp nhận và phân tích dữ liệu. Sau đó dữ liệu được gửi vào Elasticsearch; Elasticsearch nhận dữ liệu từ Logstash và lưu trữ, đánh chỉ mục; Kibana sử dụng các dữ liệu trong Elasticsearch để hiển thị và phân tích cú pháp tìm kiếm mà người dùng nhập vào để gửi cho Elasticsearch tìm kiếm.
 
